@@ -1,0 +1,40 @@
+version: "3.7"
+volumes:
+  php-fpm-socket:
+  mysql-data:
+  redis-data:
+services:
+  app:
+    container_name: laravel-spa-template-app
+    build: ./app
+    volumes:
+      - php-fpm-socket:/var/run/php-fpm
+      - ../app:/var/www/app
+  web:
+    container_name: laravel-spa-template-web
+    build: ./nginx
+    ports:
+      - 80:80
+    volumes:
+      - php-fpm-socket:/var/run/php-fpm
+      - ../app:/var/www/app
+  mysql:
+    container_name: laravel-spa-template-mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: laravel_template
+      MYSQL_USER: laravel_template
+      MYSQL_PASSWORD: laravel_template
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+  redis:
+    container_name: laravel-spa-template-redis
+    image: redis:6.0.6
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-data:/data
