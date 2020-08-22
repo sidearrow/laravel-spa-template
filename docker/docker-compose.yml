@@ -1,8 +1,8 @@
 version: "3.7"
 volumes:
   php-fpm-socket:
-  mysql-data:
-  redis-data:
+  lara-spa-tmpl-mysql-data:
+  lara-spa-tmpl-redis-data:
 services:
   app:
     container_name: laravel-spa-template-app
@@ -29,12 +29,13 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - mysql-data:/var/lib/mysql
+      - lara-spa-tmpl-mysql-data:/var/lib/mysql
       - ./mysql/init:/docker-entrypoint-initdb.d
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
   redis:
     container_name: laravel-spa-template-redis
     image: redis:6.0.6
     ports:
       - 6379:6379
     volumes:
-      - redis-data:/data
+      - lara-spa-tmpl-redis-data:/data
