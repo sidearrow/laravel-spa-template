@@ -1,8 +1,7 @@
-FROM php:7.4-fpm-buster
-
-ENV COMPOSER_ALLOW_SUPERUSER=1
+FROM php:7.4-apache
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN apt-get update \
   && apt-get -y install git libicu-dev libonig-dev libzip-dev unzip locales \
@@ -12,6 +11,8 @@ RUN git clone https://github.com/phpredis/phpredis.git /usr/src/php/ext/redis
 
 RUN docker-php-ext-install intl pdo_mysql mbstring zip bcmath redis
 
-COPY ./zzz-www.conf /usr/local/etc/php-fpm.d/zzz-www.conf
+RUN a2enmod rewrite
 
-WORKDIR /var/www/app
+COPY ./000-default.conf /etc/apache2/sites-enabled/
+
+WORKDIR /var/www/html/app
