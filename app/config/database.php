@@ -3,6 +3,7 @@
 use Illuminate\Support\Str;
 
 return [
+    'migrations' => 'migrations',
     'default' => 'default',
     'connections' => [
         'default' => [

@@ -36,6 +36,9 @@ class RouteServiceProvider extends ServiceProvider
     public function map()
     {
         Route::middleware('api')
+            ->group(base_path('routes/no_auth_routes.php'));
+
+        Route::middleware('api')
             ->namespace($this->namespace)
             ->group(base_path('routes/api.php'));
     }
