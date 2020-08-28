@@ -1,16 +1,45 @@
-import React from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import { LoginPage } from './Login/LoginPage';
+import React, { useContext } from 'react';
+import {
+  BrowserRouter,
+  Switch,
+  Route,
+  Redirect,
+  RouteProps,
+} from 'react-router-dom';
+import { LoginPage } from './pages/login/LoginPage';
+import { AuthContext } from './providers/AuthProvider';
+
+const LoginRoute: React.FC<RouteProps> = (props) => {
+  const status = useContext(AuthContext).status;
+  if (status === null) {
+    return <></>;
+  }
+  if (status) {
+    return <Redirect to="/" />;
+  }
+  return <Route {...props} />;
+};
+
+const PrivateRoute: React.FC<RouteProps> = (props) => {
+  const status = useContext(AuthContext).status;
+  if (status === null) {
+    return <></>;
+  }
+  if (status) {
+    return <Route {...props} />;
+  }
+  return <Redirect to="/login" />;
+};
 
 export const Router: React.FC = () => (
   <BrowserRouter>
     <Switch>
-      <Route path="/login" exact>
+      <LoginRoute path="/login" exact>
         <LoginPage />
-      </Route>
-      <Route path="/aaa" exact>
+      </LoginRoute>
+      <PrivateRoute path="/" exact>
         <div>aaa</div>
-      </Route>
+      </PrivateRoute>
     </Switch>
   </BrowserRouter>
 );
