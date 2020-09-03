@@ -2,37 +2,51 @@
 
 namespace Tests\Feature;
 
-use App\Models\UsersModel;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
 {
-    use RefreshDatabase;
-
-    public function setUp(): void
+    private function createUser()
     {
-        var_dump([env('DB_HOST')]);
-        parent::setUp();
-
-        factory(UsersModel::class)->make([
-            'user_id' => 'admin',
-            'first_name' => 'admin_first_name',
-            'last_name' => 'admin_last_name',
-            'password' => password_hash('password', PASSWORD_DEFAULT),
-        ]);
+        DB::table('users')
+            ->insert([
+                'user_id' => 'admin',
+                'first_name' => 'first_name',
+                'last_name' => 'last_name',
+                'password' => password_hash('password', PASSWORD_BCRYPT),
+            ]);
     }
 
-    public function testBasicTest()
+    private function deleteUser()
     {
-        $response = $this->json(
-            'POST',
+        DB::table('users')
+            ->where('user_id', '=', 'admin')
+            ->delete();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->createUser();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->deleteUser();
+    }
+
+    public function testLoginSuccess()
+    {
+        $response = $this->postJson(
             '/login',
             [
-                'user_id' => 'admin',
+                'userId' => 'admin',
                 'password' => 'password',
-            ]
+            ],
         );
+
+        $response->dump();
 
         $response->assertStatus(200);
     }

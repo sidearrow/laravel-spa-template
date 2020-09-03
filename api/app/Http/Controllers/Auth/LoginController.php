@@ -18,7 +18,7 @@ class LoginController extends Controller
         $user = UsersModel::where('user_id', $userId)->first();
 
         if ($user === null) {
-            abort(403, 'User is not registed.');
+            abort(403, 'User is not registed.  ' . $userId);
         }
 
         if (!password_verify($password, $user->password)) {
