@@ -1,0 +1,55 @@
+version: "3.7"
+volumes:
+  admin-app-tmpl-php-fpm-socket:
+  admin-app-tmpl-mysql-data:
+  admin-app-tmpl-redis-data:
+services:
+  app:
+    container_name: admin-app-tmpl-app
+    build: ./docker/api
+    volumes:
+      - admin-app-tmpl-php-fpm-socket:/var/run/php-fpm
+      - ./api:/var/www/app
+
+  web:
+    container_name: admin-app-tmpl-web
+    build: ./docker/nginx
+    ports:
+      - 80:80
+    volumes:
+      - admin-app-tmpl-php-fpm-socket:/var/run/php-fpm
+      - ./api:/var/www/app
+
+  mysql:
+    container_name: admin-app-tmpl-mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: admin_app_tmpl
+      MYSQL_USER: admin_app_tmpl_user
+      MYSQL_PASSWORD: admin_app_tmpl_password
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - 3306:3306
+    volumes:
+      - admin-app-tmpl-mysql-data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    command: >
+      mysqld
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
+
+  # mysql container for testing
+  test-mysql:
+    container_name: admin-app-tmpl-test-mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: admin_app_tmpl
+      MYSQL_USER: admin_app_tmpl_test_user
+      MYSQL_PASSWORD: admin_app_tmpl_test_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - 13306:3306
+    volumes:
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
